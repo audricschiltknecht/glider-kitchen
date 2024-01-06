@@ -1,0 +1,5 @@
+[workspace]
+members = [
+    "glider-kitchen-ai",
+    "glider-kitchen",
+]
