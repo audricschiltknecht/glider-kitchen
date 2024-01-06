@@ -30,12 +30,12 @@ struct RatioTable {
 struct Configuration {
     min_ratio: Ratio,
     max_ratio: Ratio,
-    max_ingredient_per_recipe: u8,
-    table_file_path: String,
+    min_ingredients: u8,
+    max_ingredients: u8,
 }
 
-#[derive(Default, Clone)]
-struct Recipe {
+#[derive(Default, Clone, Debug)]
+pub struct Recipe {
     ratio: Ratio,
     ingredients: Vec<String>,
 }
@@ -43,11 +43,12 @@ struct Recipe {
 impl Recipe {
     fn add_ingredient_to_recipe(
         &mut self,
-        ingredient: String,
+        ingredient: &str,
         table: &IngredientToRatio,
     ) -> Result<(), Error> {
-        if !self.ingredients.contains(&ingredient) {
-            self.ingredients.push(ingredient);
+        let owned_ingredient = ingredient.to_string();
+        if !self.ingredients.contains(&owned_ingredient) {
+            self.ingredients.push(owned_ingredient);
             self.ratio = self.compute_ratio(table);
             Ok(())
         } else {
@@ -96,9 +97,9 @@ fn ratio_table_to_table_per_type(
 }
 
 impl KitchenAi {
-    pub fn new(config_file_path: &str) -> KitchenAi {
-        let config: Configuration = load_file(config_file_path);
-        let ratio_table: RatioTable = load_file(&config.table_file_path);
+    pub fn new(config_filepath: &str, ratio_tables_filepath: &str) -> KitchenAi {
+        let config: Configuration = load_file(config_filepath);
+        let ratio_table: RatioTable = load_file(ratio_tables_filepath);
 
         let table_per_type = ratio_table_to_table_per_type(ratio_table);
 
@@ -130,7 +131,7 @@ impl KitchenAi {
                 self.recipes
                     .entry(type_of_ingredient)
                     .or_default()
-                    .add_ingredient_to_recipe(ingredient.to_string(), table)
+                    .add_ingredient_to_recipe(ingredient, table)
                     .expect("Ingredient should have been added");
                 Ok(())
             }
@@ -149,38 +150,57 @@ impl KitchenAi {
         self.config.min_ratio <= ratio && ratio <= self.config.max_ratio
     }
 
-    pub fn predict(&self, type_of_ingredient: TypeOfIngredient) -> Result<Vec<String>, Error> {
+    pub fn predict(&self, type_of_ingredient: TypeOfIngredient) -> Result<Vec<Recipe>, Error> {
         match self.ratio_tables.get(&type_of_ingredient) {
             None => Err(Default::default()),
             Some(ratios) => {
-                let r = match self.recipes.get(&type_of_ingredient) {
+                let recipe = match self.recipes.get(&type_of_ingredient) {
                     None => Default::default(),
                     Some(r) => r.clone(),
                 };
-                Ok(self.select_next_ingredients_for_recipe(r, ratios))
+                match self._internal_predict(&recipe, ratios) {
+                    None => Err(Default::default()),
+                    Some(recipes) => Ok(recipes),
+                }
             }
         }
     }
 
-    fn select_next_ingredients_for_recipe(
+    fn _internal_predict(
         &self,
-        recipe: Recipe,
-        table: &IngredientToRatio,
-    ) -> Vec<String> {
-        if recipe.ingredients.len() >= self.config.max_ingredient_per_recipe as usize {
-            Default::default()
+        recipe: &Recipe,
+        ratios: &IngredientToRatio,
+    ) -> Option<Vec<Recipe>> {
+        let number_ingredients = recipe.ingredients.len();
+
+        if number_ingredients == self.config.max_ingredients as usize {
+            return if self.config.min_ratio <= recipe.ratio && recipe.ratio <= self.config.max_ratio
+            {
+                Some(vec![recipe.clone()])
+            } else {
+                None
+            };
         }
 
-        table
-            .keys()
-            .filter(|&ingredient| {
-                let mut r = recipe.clone();
-                match r.add_ingredient_to_recipe(ingredient.clone(), table) {
-                    Err(_) => false, // Ingredient already in recipe
-                    Ok(()) => self.config.min_ratio <= r.ratio && r.ratio <= self.config.max_ratio,
-                }
-            })
-            .cloned()
-            .collect()
+        let mut out: Vec<Recipe> = Default::default();
+        if number_ingredients >= self.config.min_ingredients as usize
+            && self.config.min_ratio <= recipe.ratio
+            && recipe.ratio <= self.config.max_ratio
+        {
+            out.push(recipe.clone());
+        }
+
+        let next_ingredients = ratios.keys();
+        for ingredient in next_ingredients {
+            let mut new_recipe = recipe.clone();
+            match new_recipe.add_ingredient_to_recipe(ingredient, ratios) {
+                Err(_) => {} // Ingredient already in recipe
+                Ok(()) => match self._internal_predict(&new_recipe, ratios) {
+                    None => {}
+                    Some(possibilities) => out.extend(possibilities),
+                },
+            }
+        }
+        Some(out)
     }
 }

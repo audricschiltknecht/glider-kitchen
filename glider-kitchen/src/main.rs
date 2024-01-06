@@ -3,7 +3,7 @@ use crate::app::KitchenApp;
 use glider_kitchen_ai::TypeOfIngredient;
 
 fn main() {
-    let mut ai = glider_kitchen_ai::KitchenAi::new("config.toml");
+    let mut ai = glider_kitchen_ai::KitchenAi::new("config.toml", "table.toml");
 
     ai.add_ingredient(TypeOfIngredient::FRUIT, "banana")
         .expect("Should work");

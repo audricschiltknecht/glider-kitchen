@@ -1,4 +1,4 @@
 min_ratio = 1.5
 max_ratio = 2.5
-max_ingredient_per_recipe = 4
-table_file_path = "table.toml"
+min_ingredients = 3
+max_ingredients = 4
