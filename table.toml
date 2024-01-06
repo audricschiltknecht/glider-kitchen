@@ -12,3 +12,8 @@ ratio = 1.2
 name = "peach"
 type = "fruit"
 ratio = 0.5
+
+[[entry]]
+name = "apple"
+type = "fruit"
+ratio = 3

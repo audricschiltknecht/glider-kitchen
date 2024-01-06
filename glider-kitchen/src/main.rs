@@ -1,9 +1,11 @@
+mod app;
+use crate::app::KitchenApp;
 use glider_kitchen_ai::TypeOfIngredient;
 
 fn main() {
-    let mut ai = glider_kitchen_ai::KitchenAi::new(String::from("config.toml"));
+    let mut ai = glider_kitchen_ai::KitchenAi::new("config.toml", "table.toml");
 
-    ai.add_ingredient(TypeOfIngredient::FRUIT, &String::from("banana"))
+    ai.add_ingredient(TypeOfIngredient::FRUIT, "banana")
         .expect("Should work");
     println!("Ratio fruits: {}", ai.get_ratio(TypeOfIngredient::FRUIT));
     println!(
@@ -11,7 +13,7 @@ fn main() {
         ai.get_ratio(TypeOfIngredient::VEGETABLE)
     );
 
-    ai.add_ingredient(TypeOfIngredient::FRUIT, &String::from("peach"))
+    ai.add_ingredient(TypeOfIngredient::FRUIT, "peach")
         .expect("Should work");
     println!("Ratio fruits: {}", ai.get_ratio(TypeOfIngredient::FRUIT));
 
@@ -19,4 +21,9 @@ fn main() {
         "Ratio fruits is valid: {}",
         ai.is_valid(TypeOfIngredient::FRUIT)
     );
+
+    let predictions = ai.predict(TypeOfIngredient::FRUIT).expect("Should work");
+
+    println!("Predictions: {:?}", predictions);
+
 }
