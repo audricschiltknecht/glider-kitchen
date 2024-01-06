@@ -1,19 +1,404 @@
 [[entry]]
-name = "banana"
+name = "papaye"
+type = "fruit"
+ratio = 4.8
+
+[[entry]]
+name = "citron"
+type = "fruit"
+ratio = 4
+
+[[entry]]
+name = "orange"
+type = "fruit"
+ratio = 2.9
+
+[[entry]]
+name = "figue"
+type = "fruit"
+ratio = 2.5
+
+[[entry]]
+name = "framboise"
+type = "fruit"
+ratio = 1.8
+
+[[entry]]
+name = "lime"
+type = "fruit"
+ratio = 1.8
+
+[[entry]]
+name = "mûre"
+type = "fruit"
+ratio = 1.5
+
+[[entry]]
+name = "pamplemousse blanc"
+type = "fruit"
+ratio = 1.5
+
+[[entry]]
+name = "raisin"
 type = "fruit"
 ratio = 1.4
 
 [[entry]]
-name = "bok-choy"
-type = "vegetable"
+name = "tangerine"
+type = "fruit"
+ratio = 1.4
+
+[[entry]]
+name = "pamplemousse rose/rouge"
+type = "fruit"
 ratio = 1.2
 
 [[entry]]
-name = "peach"
+name = "ananas"
+type = "fruit"
+ratio = 1
+
+[[entry]]
+name = "poire"
+type = "fruit"
+ratio = 1
+
+[[entry]]
+name = "pomme avec pelure"
+type = "fruit"
+ratio = 1
+
+[[entry]]
+name = "mangue"
+type = "fruit"
+ratio = 0.9
+
+[[entry]]
+name = "melon d'eau"
+type = "fruit"
+ratio = 0.9
+
+[[entry]]
+name = "cerise"
+type = "fruit"
+ratio = 0.8
+
+[[entry]]
+name = "fraise"
+type = "fruit"
+ratio = 0.8
+
+[[entry]]
+name = "canneberge"
+type = "fruit"
+ratio = 0.8
+
+[[entry]]
+name = "date"
+type = "fruit"
+ratio = 0.8
+
+[[entry]]
+name = "melon jaune"
+type = "fruit"
+ratio = 0.7
+
+[[entry]]
+name = "abricot"
+type = "fruit"
+ratio = 0.7
+
+[[entry]]
+name = "kiwi"
+type = "fruit"
+ratio = 0.7
+
+[[entry]]
+name = "bleuet"
+type = "fruit"
+ratio = 0.6
+
+[[entry]]
+name = "melon miel"
+type = "fruit"
+ratio = 0.6
+
+[[entry]]
+name = "pomme sans pelure"
+type = "fruit"
+ratio = 0.6
+
+[[entry]]
+name = "cantaloup"
+type = "fruit"
+ratio = 0.6
+
+[[entry]]
+name = "citrouille"
 type = "fruit"
 ratio = 0.5
 
 [[entry]]
-name = "apple"
+name = "raisin sec"
 type = "fruit"
+ratio = 0.5
+
+[[entry]]
+name = "prune"
+type = "fruit"
+ratio = 0.4
+
+[[entry]]
+name = "pêche"
+type = "fruit"
+ratio = 0.4
+
+[[entry]]
+name = "fruit du dragon"
+type = "fruit"
+ratio = 0.4
+
+[[entry]]
+name = "nectarine"
+type = "fruit"
+ratio = 0.3
+
+[[entry]]
+name = "banane"
+type = "fruit"
+ratio = 0.3
+
+[[entry]]
+name = "pomme grenade"
+type = "fruit"
+ratio = 0.3
+
+[[entry]]
+name = "carambole"
+type = "fruit"
+ratio = 0.2
+
+[[entry]]
+name = "tomate"
+type = "fruit"
+ratio = 0.2
+
+[[entry]]
+name = "fruit de la passion"
+type = "fruit"
+ratio = 0.1
+
+[[entry]]
+name = "plantain"
+type = "fruit"
+ratio = 0.1
+
+[[entry]]
+name = "choux cavalier"
+type = "vegetable"
+ratio = 14.5
+
+[[entry]]
+name = "feuille de moutarge"
+type = "vegetable"
+ratio = 7.5
+
+[[entry]]
+name = "feuille de betterave"
+type = "vegetable"
 ratio = 3
+
+[[entry]]
+name = "bok choy"
+type = "vegetable"
+ratio = 2.9
+
+[[entry]]
+name = "feuille de pissentlit"
+type = "vegetable"
+ratio = 2.8
+
+[[entry]]
+name = "choux chinois"
+type = "vegetable"
+ratio = 2.8
+
+[[entry]]
+name = "laitue frisée"
+type = "vegetable"
+ratio = 2.7
+
+[[entry]]
+name = "persil"
+type = "vegetable"
+ratio = 2.4
+
+[[entry]]
+name = "choux kale"
+type = "vegetable"
+ratio = 2.4
+
+[[entry]]
+name = "chicorée"
+type = "vegetable"
+ratio = 2.1
+
+[[entry]]
+name = "choux vert"
+type = "vegetable"
+ratio = 2
+
+[[entry]]
+name = "épinard"
+type = "vegetable"
+ratio = 2
+
+[[entry]]
+name = "cresson"
+type = "vegetable"
+ratio = 2
+
+[[entry]]
+name = "endive"
+type = "vegetable"
+ratio = 1.9
+
+[[entry]]
+name = "courge spaghetti"
+type = "vegetable"
+ratio = 1.9
+
+[[entry]]
+name = "courge musquée"
+type = "vegetable"
+ratio = 1.5
+
+[[entry]]
+name = "céleri"
+type = "vegetable"
+ratio = 1.5
+
+[[entry]]
+name = "choux rouge"
+type = "vegetable"
+ratio = 1.2
+
+[[entry]]
+name = "fève verte et jaune"
+type = "vegetable"
+ratio = 1.1
+
+[[entry]]
+name = "bette à carde"
+type = "vegetable"
+ratio = 1.1
+
+[[entry]]
+name = "radis"
+type = "vegetable"
+ratio = 1.1
+
+[[entry]]
+name = "navet"
+type = "vegetable"
+ratio = 1.1
+
+[[entry]]
+name = "roquette"
+type = "vegetable"
+ratio = 1
+
+[[entry]]
+name = "laitue iceberg"
+type = "vegetable"
+ratio = 1
+
+[[entry]]
+name = "courge poivrée"
+type = "vegetable"
+ratio = 0.9
+
+[[entry]]
+name = "concombre"
+type = "vegetable"
+ratio = 0.8
+
+[[entry]]
+name = "laitue romaine"
+type = "vegetable"
+ratio = 0.8
+
+[[entry]]
+name = "patate douce"
+type = "vegetable"
+ratio = 0.8
+
+[[entry]]
+name = "brocolis"
+type = "vegetable"
+ratio = 0.7
+
+[[entry]]
+name = "carotte"
+type = "vegetable"
+ratio = 0.6
+
+[[entry]]
+name = "choux fleur"
+type = "vegetable"
+ratio = 0.6
+
+[[entry]]
+name = "choux de Bruxelles"
+type = "vegetable"
+ratio = 0.6
+
+[[entry]]
+name = "courgette"
+type = "vegetable"
+ratio = 0.5
+
+[[entry]]
+name = "poivron vert"
+type = "vegetable"
+ratio = 0.5
+
+[[entry]]
+name = "luzerne"
+type = "vegetable"
+ratio = 0.5
+
+[[entry]]
+name = "panais"
+type = "vegetable"
+ratio = 0.5
+
+[[entry]]
+name = "asperge"
+type = "vegetable"
+ratio = 0.4
+
+[[entry]]
+name = "betterave"
+type = "vegetable"
+ratio = 0.4
+
+[[entry]]
+name = "aubergine"
+type = "vegetable"
+ratio = 0.3
+
+[[entry]]
+name = "avocat"
+type = "vegetable"
+ratio = 0.3
+
+[[entry]]
+name = "maïs"
+type = "vegetable"
+ratio = 0.2
+
+[[entry]]
+name = "pois vert"
+type = "vegetable"
+ratio = 0.2
