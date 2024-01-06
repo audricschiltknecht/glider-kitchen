@@ -3,3 +3,4 @@ members = [
     "glider-kitchen-ai",
     "glider-kitchen",
 ]
+resolver = "2"
