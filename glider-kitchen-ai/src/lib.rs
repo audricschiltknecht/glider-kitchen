@@ -30,10 +30,11 @@ struct RatioTable {
 struct Configuration {
     min_ratio: Ratio,
     max_ratio: Ratio,
+    max_ingredient_per_recipe: u8,
     table_file_path: String,
 }
 
-#[derive(Default)]
+#[derive(Default, Clone)]
 struct Recipe {
     ratio: Ratio,
     ingredients: Vec<String>,
@@ -42,11 +43,11 @@ struct Recipe {
 impl Recipe {
     fn add_ingredient_to_recipe(
         &mut self,
-        ingredient: &String,
+        ingredient: String,
         table: &IngredientToRatio,
     ) -> Result<(), Error> {
-        if !self.ingredients.contains(ingredient) {
-            self.ingredients.push(ingredient.clone());
+        if !self.ingredients.contains(&ingredient) {
+            self.ingredients.push(ingredient);
             self.ratio = self.compute_ratio(table);
             Ok(())
         } else {
@@ -74,7 +75,7 @@ pub struct KitchenAi {
     recipes: HashMap<TypeOfIngredient, Recipe>,
 }
 
-fn load_file<T>(config_file_path: &String) -> T
+fn load_file<T>(config_file_path: &str) -> T
 where
     T: DeserializeOwned,
 {
@@ -95,20 +96,20 @@ fn ratio_table_to_table_per_type(
 }
 
 impl KitchenAi {
-    pub fn new(config_file_path: String) -> KitchenAi {
-        let config: Configuration = load_file(&config_file_path);
+    pub fn new(config_file_path: &str) -> KitchenAi {
+        let config: Configuration = load_file(config_file_path);
         let ratio_table: RatioTable = load_file(&config.table_file_path);
 
         let table_per_type = ratio_table_to_table_per_type(ratio_table);
 
         println!("Vegetables:");
         let vegetables = &table_per_type[&TypeOfIngredient::VEGETABLE];
-        for (key, value) in vegetables.into_iter() {
+        for (key, value) in vegetables.iter() {
             println!("{} = {}", key, value);
         }
         println!("Fruits:");
         let fruits = &table_per_type[&TypeOfIngredient::FRUIT];
-        for (key, value) in fruits.into_iter() {
+        for (key, value) in fruits.iter() {
             println!("{} = {}", key, value);
         }
         KitchenAi {
@@ -121,7 +122,7 @@ impl KitchenAi {
     pub fn add_ingredient(
         &mut self,
         type_of_ingredient: TypeOfIngredient,
-        ingredient: &String,
+        ingredient: &str,
     ) -> Result<(), Error> {
         match self.ratio_tables.get(&type_of_ingredient) {
             None => Err(Default::default()),
@@ -129,7 +130,7 @@ impl KitchenAi {
                 self.recipes
                     .entry(type_of_ingredient)
                     .or_default()
-                    .add_ingredient_to_recipe(ingredient, table)
+                    .add_ingredient_to_recipe(ingredient.to_string(), table)
                     .expect("Ingredient should have been added");
                 Ok(())
             }
@@ -145,6 +146,41 @@ impl KitchenAi {
 
     pub fn is_valid(&self, type_of_ingredient: TypeOfIngredient) -> bool {
         let ratio = self.get_ratio(type_of_ingredient);
-        return self.config.min_ratio <= ratio && ratio <= self.config.max_ratio;
+        self.config.min_ratio <= ratio && ratio <= self.config.max_ratio
+    }
+
+    pub fn predict(&self, type_of_ingredient: TypeOfIngredient) -> Result<Vec<String>, Error> {
+        match self.ratio_tables.get(&type_of_ingredient) {
+            None => Err(Default::default()),
+            Some(ratios) => {
+                let r = match self.recipes.get(&type_of_ingredient) {
+                    None => Default::default(),
+                    Some(r) => r.clone(),
+                };
+                Ok(self.select_next_ingredients_for_recipe(r, ratios))
+            }
+        }
+    }
+
+    fn select_next_ingredients_for_recipe(
+        &self,
+        recipe: Recipe,
+        table: &IngredientToRatio,
+    ) -> Vec<String> {
+        if recipe.ingredients.len() >= self.config.max_ingredient_per_recipe as usize {
+            Default::default()
+        }
+
+        table
+            .keys()
+            .filter(|&ingredient| {
+                let mut r = recipe.clone();
+                match r.add_ingredient_to_recipe(ingredient.clone(), table) {
+                    Err(_) => false, // Ingredient already in recipe
+                    Ok(()) => self.config.min_ratio <= r.ratio && r.ratio <= self.config.max_ratio,
+                }
+            })
+            .cloned()
+            .collect()
     }
 }
