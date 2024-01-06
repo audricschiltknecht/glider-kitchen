@@ -3,6 +3,7 @@ use serde::Deserialize;
 use std::collections::HashMap;
 use std::fmt::Error;
 use std::fs;
+use std::path::Path;
 
 #[derive(Deserialize, Eq, PartialEq, Hash, Debug)]
 #[serde(rename_all = "lowercase")]
@@ -27,7 +28,7 @@ struct RatioTable {
 }
 
 #[derive(Deserialize, Debug)]
-struct Configuration {
+pub struct Configuration {
     min_ratio: Ratio,
     max_ratio: Ratio,
     min_ingredients: u8,
@@ -76,11 +77,11 @@ pub struct KitchenAi {
     recipes: HashMap<TypeOfIngredient, Recipe>,
 }
 
-fn load_file<T>(config_file_path: &str) -> T
+fn load_file<T>(path: &Path) -> T
 where
     T: DeserializeOwned,
 {
-    let content = fs::read_to_string(config_file_path).expect("Config file needs to be readable");
+    let content = fs::read_to_string(path).expect("Config file needs to be readable");
     toml::from_str(content.as_str()).unwrap()
 }
 
@@ -97,27 +98,27 @@ fn ratio_table_to_table_per_type(
 }
 
 impl KitchenAi {
-    pub fn new(config_filepath: &str, ratio_tables_filepath: &str) -> KitchenAi {
+    pub fn new(config_filepath: &Path) -> KitchenAi {
         let config: Configuration = load_file(config_filepath);
-        let ratio_table: RatioTable = load_file(ratio_tables_filepath);
 
-        let table_per_type = ratio_table_to_table_per_type(ratio_table);
-
-        println!("Vegetables:");
-        let vegetables = &table_per_type[&TypeOfIngredient::VEGETABLE];
-        for (key, value) in vegetables.iter() {
-            println!("{} = {}", key, value);
-        }
-        println!("Fruits:");
-        let fruits = &table_per_type[&TypeOfIngredient::FRUIT];
-        for (key, value) in fruits.iter() {
-            println!("{} = {}", key, value);
-        }
         KitchenAi {
             config,
-            ratio_tables: table_per_type,
+            ratio_tables: Default::default(),
             recipes: Default::default(),
         }
+    }
+
+    pub fn new_with_config(config: Configuration) -> KitchenAi {
+        KitchenAi {
+            config,
+            ratio_tables: Default::default(),
+            recipes: Default::default(),
+        }
+    }
+
+    pub fn load_tables(&mut self, ratio_tables_filepath: &Path) {
+        let ratio_table: RatioTable = load_file(ratio_tables_filepath);
+        self.ratio_tables = ratio_table_to_table_per_type(ratio_table);
     }
 
     pub fn add_ingredient(
