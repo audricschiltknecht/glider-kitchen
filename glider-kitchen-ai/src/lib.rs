@@ -1,19 +1,36 @@
+use serde::de::DeserializeOwned;
 use serde::Deserialize;
 use std::collections::HashMap;
 use std::fmt::Error;
 use std::fs;
 
-#[derive(Eq, PartialEq, Hash)]
+#[derive(Deserialize, Eq, PartialEq, Hash, Debug)]
+#[serde(rename_all = "lowercase")]
 pub enum TypeOfIngredient {
-    FRUITS,
-    VEGETABLES,
+    FRUIT,
+    VEGETABLE,
 }
 type Ratio = f32;
-type Table = HashMap<String, Ratio>;
+type IngredientToRatio = HashMap<String, Ratio>;
+
+#[derive(Deserialize, Debug)]
+struct RatioEntry {
+    name: String,
+    #[serde(rename = "type")]
+    type_of_ingredient: TypeOfIngredient,
+    ratio: Ratio,
+}
+
 #[derive(Deserialize, Debug)]
 struct RatioTable {
-    fruits: HashMap<String, Ratio>,
-    vegetables: HashMap<String, Ratio>,
+    entry: Vec<RatioEntry>,
+}
+
+#[derive(Deserialize, Debug)]
+struct Configuration {
+    min_ratio: Ratio,
+    max_ratio: Ratio,
+    table_file_path: String,
 }
 
 #[derive(Default)]
@@ -26,7 +43,7 @@ impl Recipe {
     fn add_ingredient_to_recipe(
         &mut self,
         ingredient: &String,
-        table: &Table,
+        table: &IngredientToRatio,
     ) -> Result<(), Error> {
         if !self.ingredients.contains(ingredient) {
             self.ingredients.push(ingredient.clone());
@@ -37,7 +54,7 @@ impl Recipe {
         }
     }
 
-    fn compute_ratio(&self, ratio_table: &Table) -> Ratio {
+    fn compute_ratio(&self, ratio_table: &IngredientToRatio) -> Ratio {
         let ingredients = &self.ingredients;
         let t: Ratio = ingredients
             .iter()
@@ -52,35 +69,51 @@ impl Recipe {
 }
 
 pub struct KitchenAi {
-    ratio_tables: HashMap<TypeOfIngredient, Table>,
+    config: Configuration,
+    ratio_tables: HashMap<TypeOfIngredient, IngredientToRatio>,
     recipes: HashMap<TypeOfIngredient, Recipe>,
 }
 
-fn load_config(config_file_path: String) -> RatioTable {
+fn load_file<T>(config_file_path: &String) -> T
+where
+    T: DeserializeOwned,
+{
     let content = fs::read_to_string(config_file_path).expect("Config file needs to be readable");
     toml::from_str(content.as_str()).unwrap()
 }
 
+fn ratio_table_to_table_per_type(
+    tables: RatioTable,
+) -> HashMap<TypeOfIngredient, IngredientToRatio> {
+    let mut out: HashMap<TypeOfIngredient, IngredientToRatio> = Default::default();
+    for entry in tables.entry {
+        out.entry(entry.type_of_ingredient)
+            .or_default()
+            .insert(entry.name, entry.ratio);
+    }
+    out
+}
+
 impl KitchenAi {
     pub fn new(config_file_path: String) -> KitchenAi {
-        let ratio_table = load_config(config_file_path);
+        let config: Configuration = load_file(&config_file_path);
+        let ratio_table: RatioTable = load_file(&config.table_file_path);
+
+        let table_per_type = ratio_table_to_table_per_type(ratio_table);
 
         println!("Vegetables:");
-        let vegetables = &ratio_table.vegetables;
+        let vegetables = &table_per_type[&TypeOfIngredient::VEGETABLE];
         for (key, value) in vegetables.into_iter() {
             println!("{} = {}", key, value);
         }
         println!("Fruits:");
-        let fruits = &ratio_table.fruits;
+        let fruits = &table_per_type[&TypeOfIngredient::FRUIT];
         for (key, value) in fruits.into_iter() {
             println!("{} = {}", key, value);
         }
         KitchenAi {
-            ratio_tables: HashMap::from([
-                (TypeOfIngredient::FRUITS, ratio_table.fruits),
-                (TypeOfIngredient::VEGETABLES, ratio_table.vegetables),
-            ]),
-
+            config,
+            ratio_tables: table_per_type,
             recipes: Default::default(),
         }
     }
@@ -108,5 +141,10 @@ impl KitchenAi {
             None => Default::default(),
             Some(recipe) => recipe.ratio,
         }
+    }
+
+    pub fn is_valid(&self, type_of_ingredient: TypeOfIngredient) -> bool {
+        let ratio = self.get_ratio(type_of_ingredient);
+        return self.config.min_ratio <= ratio && ratio <= self.config.max_ratio;
     }
 }

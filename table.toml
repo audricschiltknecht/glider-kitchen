@@ -1,0 +1,14 @@
+[[entry]]
+name = "banana"
+type = "fruit"
+ratio = 1.4
+
+[[entry]]
+name = "bok-choy"
+type = "vegetable"
+ratio = 1.2
+
+[[entry]]
+name = "peach"
+type = "fruit"
+ratio = 0.5
