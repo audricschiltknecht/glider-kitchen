@@ -205,10 +205,10 @@ ratio = 14.5
 #type = "vegetable"
 #ratio = 7.5
 
-[[entry]]
-name = "feuille de betterave"
-type = "vegetable"
-ratio = 3
+#[[entry]]
+#name = "feuille de betterave"
+#type = "vegetable"
+#ratio = 3
 
 [[entry]]
 name = "bok choy"
@@ -225,10 +225,10 @@ ratio = 2.9
 #type = "vegetable"
 #ratio = 2.8
 
-[[entry]]
-name = "laitue frisée"
-type = "vegetable"
-ratio = 2.7
+#[[entry]]
+#name = "laitue frisée"
+#type = "vegetable"
+#ratio = 2.7
 
 #[[entry]]
 #name = "persil"
@@ -250,25 +250,25 @@ name = "choux vert"
 type = "vegetable"
 ratio = 2
 
-#[[entry]]
-#name = "épinard"
-#type = "vegetable"
-#ratio = 2
+[[entry]]
+name = "épinard"
+type = "vegetable"
+ratio = 2
 
 #[[entry]]
 #name = "cresson"
 #type = "vegetable"
 #ratio = 2
 
-[[entry]]
-name = "endive"
-type = "vegetable"
-ratio = 1.9
-
 #[[entry]]
-#name = "courge spaghetti"
+#name = "endive"
 #type = "vegetable"
 #ratio = 1.9
+#
+[[entry]]
+name = "courge spaghetti"
+type = "vegetable"
+ratio = 1.9
 
 #[[entry]]
 #name = "courge musquée"

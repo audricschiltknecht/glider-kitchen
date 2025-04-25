@@ -11,23 +11,11 @@ fn main() -> eframe::Result<()> {
     let mut ai = glider_kitchen_ai::KitchenAi::new(Path::new("./config.toml"));
     ai.load_tables(Path::new("./table.toml"));
 
-    ai.add_ingredient(TypeOfIngredient::FRUIT, "banana")
+    ai.add_ingredient(TypeOfIngredient::FRUIT, "pomme avec pelure")
         .expect("Should work");
-    println!("Ratio fruits: {}", ai.get_ratio(TypeOfIngredient::FRUIT));
-    println!(
-        "Ratio vegetables: {}",
-        ai.get_ratio(TypeOfIngredient::VEGETABLE)
-    );
-
-    ai.add_ingredient(TypeOfIngredient::FRUIT, "peach")
-        .expect("Should work");
-    println!("Ratio fruits: {}", ai.get_ratio(TypeOfIngredient::FRUIT));
-
-    println!(
-        "Ratio fruits is valid: {}",
-        ai.is_valid(TypeOfIngredient::FRUIT)
-    );
-
+            ai.add_ingredient(TypeOfIngredient::FRUIT, "banane")
+                .expect("Should work");
+    println!("Ration: {:?}", ai.get_ratio(TypeOfIngredient::FRUIT));
     let predictions = ai.predict(TypeOfIngredient::FRUIT).expect("Should work");
 
     println!("Predictions: {:?}", predictions);
