@@ -22,20 +22,21 @@ impl eframe::App for KitchenApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             // The top panel is often a good place for a menu bar:
-            egui::menu::bar(ui, |ui| {
+            egui::MenuBar::new().ui(ui, |ui| {
                 ui.menu_button("File", |ui| {
                     if ui.button("Load tables").clicked() {
                         if let Some(path) = rfd::FileDialog::new().pick_file() {
                             self.ai.load_tables(path.as_path());
-                            ui.close_menu();
+                            ui.close()
                         }
                     }
 
                     #[cfg(not(target_arch = "wasm32"))] // no File->Quit on web pages!
                     if ui.button("Quit").clicked() {
-                        _frame.close();
+                        ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                     }
                 });
+                egui::widgets::global_theme_preference_buttons(ui);
             });
         });
 
