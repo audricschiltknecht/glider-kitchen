@@ -36,6 +36,6 @@ fn main() -> eframe::Result<()> {
     eframe::run_native(
         "Glider Kitchen",
         native_options,
-        Box::new(|cc| Box::new(KitchenApp::new(cc))),
+        Box::new(|cc| Ok(Box::new(KitchenApp::new(cc)))),
     )
 }
