@@ -1,15 +1,26 @@
-use serde::de::DeserializeOwned;
 use serde::Deserialize;
+use serde::de::DeserializeOwned;
 use std::collections::HashMap;
-use std::fmt::Error;
+use std::collections::HashSet;
+use std::fmt::{Display, Error, Formatter};
 use std::fs;
+use std::hash::{Hash, Hasher};
 use std::path::Path;
 
-#[derive(Deserialize, Eq, PartialEq, Hash, Debug)]
+#[derive(Deserialize, Eq, PartialEq, Hash, Debug, Clone, Copy)]
 #[serde(rename_all = "lowercase")]
 pub enum TypeOfIngredient {
     FRUIT,
     VEGETABLE,
+}
+
+impl Display for TypeOfIngredient {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
+        match self {
+            TypeOfIngredient::FRUIT => write!(f, "FRUIT"),
+            TypeOfIngredient::VEGETABLE => write!(f, "VEGETABLE"),
+        }
+    }
 }
 type Ratio = f32;
 type IngredientToRatio = HashMap<String, Ratio>;
@@ -38,7 +49,21 @@ pub struct Configuration {
 #[derive(Default, Clone, Debug)]
 pub struct Recipe {
     ratio: Ratio,
-    ingredients: Vec<String>,
+    ingredients: HashSet<String>,
+}
+impl PartialEq for Recipe {
+    fn eq(&self, other: &Self) -> bool {
+        self.ingredients == other.ingredients
+    }
+}
+impl Eq for Recipe {}
+
+impl Hash for Recipe {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        for ingredient in &self.ingredients {
+            ingredient.hash(state);
+        }
+    }
 }
 
 impl Recipe {
@@ -49,7 +74,21 @@ impl Recipe {
     ) -> Result<(), Error> {
         let owned_ingredient = ingredient.to_string();
         if !self.ingredients.contains(&owned_ingredient) {
-            self.ingredients.push(owned_ingredient);
+            self.ingredients.insert(owned_ingredient);
+            self.ratio = self.compute_ratio(table);
+            Ok(())
+        } else {
+            Err(Default::default())
+        }
+    }
+
+    fn remove_ingredient_from_recipe(
+        &mut self,
+        ingredient: &str,
+        table: &IngredientToRatio,
+    ) -> Result<(), Error> {
+        if self.ingredients.contains(ingredient) {
+            self.ingredients.remove(ingredient);
             self.ratio = self.compute_ratio(table);
             Ok(())
         } else {
@@ -68,6 +107,10 @@ impl Recipe {
             })
             .sum();
         t / self.ingredients.len() as Ratio
+    }
+
+    pub fn get_ingredients(&self) -> &HashSet<String> {
+        &self.ingredients
     }
 }
 
@@ -121,16 +164,38 @@ impl KitchenAi {
         self.ratio_tables = ratio_table_to_table_per_type(ratio_table);
     }
 
+    pub fn get_ingredients_from_table(
+        &self,
+        type_of_ingredient: &TypeOfIngredient,
+    ) -> Result<Vec<&str>, Error> {
+        match self.ratio_tables.get(type_of_ingredient) {
+            None => Err(Default::default()),
+            Some(table) => {
+                Ok(table.keys().map(|s| s.as_str()).collect())
+                // let mut out = HashSet::new();
+                // out.extend(table.keys());
+                // Ok(out)
+            }
+        }
+    }
+
+    pub fn get_recipe(&self, type_of_ingredient: &TypeOfIngredient) -> Result<&Recipe, Error> {
+        match self.recipes.get(type_of_ingredient) {
+            None => Err(Default::default()),
+            Some(recipe) => Ok(recipe),
+        }
+    }
+
     pub fn add_ingredient(
         &mut self,
-        type_of_ingredient: TypeOfIngredient,
+        type_of_ingredient: &TypeOfIngredient,
         ingredient: &str,
     ) -> Result<(), Error> {
-        match self.ratio_tables.get(&type_of_ingredient) {
+        match self.ratio_tables.get(type_of_ingredient) {
             None => Err(Default::default()),
             Some(table) => {
                 self.recipes
-                    .entry(type_of_ingredient)
+                    .entry(*type_of_ingredient)
                     .or_default()
                     .add_ingredient_to_recipe(ingredient, table)
                     .expect("Ingredient should have been added");
@@ -139,23 +204,41 @@ impl KitchenAi {
         }
     }
 
-    pub fn get_ratio(&self, type_of_ingredient: TypeOfIngredient) -> Ratio {
-        match self.recipes.get(&type_of_ingredient) {
+    pub fn remove_ingredient(
+        &mut self,
+        type_of_ingredient: &TypeOfIngredient,
+        ingredient: &str,
+    ) -> Result<(), Error> {
+        match self.ratio_tables.get(type_of_ingredient) {
+            None => Err(Default::default()),
+            Some(table) => {
+                self.recipes
+                    .entry(*type_of_ingredient)
+                    .or_default()
+                    .remove_ingredient_from_recipe(ingredient, table)
+                    .expect("Ingredient should have been removed");
+                Ok(())
+            }
+        }
+    }
+
+    pub fn get_ratio(&self, type_of_ingredient: &TypeOfIngredient) -> Ratio {
+        match self.recipes.get(type_of_ingredient) {
             None => Default::default(),
             Some(recipe) => recipe.ratio,
         }
     }
 
-    pub fn is_valid(&self, type_of_ingredient: TypeOfIngredient) -> bool {
+    pub fn is_valid(&self, type_of_ingredient: &TypeOfIngredient) -> bool {
         let ratio = self.get_ratio(type_of_ingredient);
         self.config.min_ratio <= ratio && ratio <= self.config.max_ratio
     }
 
-    pub fn predict(&self, type_of_ingredient: TypeOfIngredient) -> Result<Vec<Recipe>, Error> {
-        match self.ratio_tables.get(&type_of_ingredient) {
+    pub fn predict(&self, type_of_ingredient: &TypeOfIngredient) -> Result<HashSet<Recipe>, Error> {
+        match self.ratio_tables.get(type_of_ingredient) {
             None => Err(Default::default()),
             Some(ratios) => {
-                let recipe = match self.recipes.get(&type_of_ingredient) {
+                let recipe = match self.recipes.get(type_of_ingredient) {
                     None => Default::default(),
                     Some(r) => r.clone(),
                 };
@@ -171,24 +254,26 @@ impl KitchenAi {
         &self,
         recipe: &Recipe,
         ratios: &IngredientToRatio,
-    ) -> Option<Vec<Recipe>> {
+    ) -> Option<HashSet<Recipe>> {
         let number_ingredients = recipe.ingredients.len();
 
         if number_ingredients == self.config.max_ingredients as usize {
             return if self.config.min_ratio <= recipe.ratio && recipe.ratio <= self.config.max_ratio
             {
-                Some(vec![recipe.clone()])
+                let mut out = HashSet::new();
+                out.insert(recipe.clone());
+                Some(out)
             } else {
                 None
             };
         }
 
-        let mut out: Vec<Recipe> = Default::default();
+        let mut out: HashSet<Recipe> = Default::default();
         if number_ingredients >= self.config.min_ingredients as usize
             && self.config.min_ratio <= recipe.ratio
             && recipe.ratio <= self.config.max_ratio
         {
-            out.push(recipe.clone());
+            out.insert(recipe.clone());
         }
 
         let next_ingredients = ratios.keys();

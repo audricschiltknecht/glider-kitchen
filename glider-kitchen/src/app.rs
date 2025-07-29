@@ -1,8 +1,14 @@
-use glider_kitchen_ai::KitchenAi;
+use egui::Ui;
+use glider_kitchen_ai::{KitchenAi, TypeOfIngredient};
+use log::info;
+use std::collections::{HashMap, HashSet};
 use std::default::Default;
 use std::path::Path;
+
 pub struct KitchenApp {
     ai: KitchenAi,
+    tables_loaded: bool,
+    available_ingredients: HashMap<TypeOfIngredient, HashSet<String>>,
 }
 
 impl KitchenApp {
@@ -12,7 +18,100 @@ impl KitchenApp {
 
         KitchenApp {
             ai: KitchenAi::new(Path::new("./config.toml")),
+            tables_loaded: false,
+            available_ingredients: Default::default(),
         }
+    }
+
+    fn display_ingredients(&mut self, ui: &mut Ui, type_of_ingredient: &TypeOfIngredient) {
+        let ingredients = self
+            .ai
+            .get_ingredients_from_table(type_of_ingredient)
+            .expect("List of ingredients");
+        let selected_ingredients = match self.ai.get_recipe(type_of_ingredient) {
+            Ok(recipe) => recipe.get_ingredients().clone(),
+            _ => {
+                info!("No recipe yet for {type_of_ingredient}!");
+                HashSet::new()
+            }
+        };
+
+        // Copy vector as we need to release self.ai, and sort it so display is stable
+        let mut sorted_ingredients: Vec<String> =
+            ingredients.into_iter().map(|s| s.to_string()).collect();
+        sorted_ingredients.sort();
+
+        egui::Grid::new(type_of_ingredient).show(ui, |ui| {
+            let mut idx = 0;
+            for ingredient in sorted_ingredients {
+                let mut label = ingredient.to_owned();
+                let ingredient_selected = selected_ingredients.contains(&label);
+                if ingredient_selected {
+                    label += "*";
+                }
+
+                let ingredient_enabled = if !selected_ingredients.is_empty() {
+                    self.available_ingredients
+                        .get(type_of_ingredient)
+                        .unwrap_or(&HashSet::new())
+                        .contains(&ingredient)
+                } else {
+                    true
+                };
+
+                if ui
+                    .add_enabled(ingredient_enabled, egui::Button::new(label))
+                    .clicked()
+                {
+                    if ingredient_selected {
+                        self.ai
+                            .remove_ingredient(type_of_ingredient, &ingredient)
+                            .expect("All good!");
+                    } else {
+                        self.ai
+                            .add_ingredient(type_of_ingredient, &ingredient)
+                            .expect("All good!");
+                    }
+                    self.recompute_predictions(type_of_ingredient);
+                }
+
+                idx += 1;
+                if idx % 5 == 0 {
+                    ui.end_row();
+                }
+            }
+        });
+    }
+
+    fn recompute_predictions(&mut self, type_of_ingredient: &TypeOfIngredient) {
+        let predictions = self.ai.predict(type_of_ingredient).expect("All good!");
+        // println!("Predictions: {predictions:?}");
+
+        // Concatenate all ingredients from all recipes into a single HashSet
+        let mut all_ingredients = HashSet::new();
+        for recipe in predictions {
+            all_ingredients.extend(recipe.get_ingredients().iter().cloned());
+        }
+
+        self.available_ingredients
+            .insert(*type_of_ingredient, all_ingredients);
+    }
+
+    fn display_current_ratio(&self, ui: &mut Ui, type_of_ingredient: &TypeOfIngredient) {
+        let ratio = self.ai.get_ratio(type_of_ingredient);
+        let ratio_valid = self.ai.is_valid(type_of_ingredient);
+        let color = if ratio_valid {
+            egui::Color32::GREEN
+        } else {
+            egui::Color32::RED
+        };
+        ui.centered_and_justified(|ui| {
+            ui.label(
+                egui::RichText::new(ratio.to_string())
+                    .size(20.0)
+                    .color(color),
+            );
+        });
     }
 }
 
@@ -27,6 +126,7 @@ impl eframe::App for KitchenApp {
                     if ui.button("Load tables").clicked() {
                         if let Some(path) = rfd::FileDialog::new().pick_file() {
                             self.ai.load_tables(path.as_path());
+                            self.tables_loaded = true;
                             ui.close()
                         }
                     }
@@ -36,20 +136,34 @@ impl eframe::App for KitchenApp {
                         ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                     }
                 });
-                egui::widgets::global_theme_preference_buttons(ui);
+                //egui::widgets::global_theme_preference_buttons(ui);
             });
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            // The central panel the region left after adding TopPanel's and SidePanel's
+            // The central panel is the region left after adding TopPanel's and SidePanel's
 
             ui.heading("Glider Kitchen");
-            ui.hyperlink("https://github.com/emilk/eframe_template");
-            ui.add(egui::github_link_file!(
-                "https://github.com/emilk/eframe_template/blob/master/",
-                "Source code."
-            ));
+            ui.hyperlink("https://github.com/audricschiltknecht/glider-kitchen");
             egui::warn_if_debug_build(ui);
+
+            ui.separator();
+
+            if self.tables_loaded {
+                ui.horizontal(|ui| {
+                    self.display_ingredients(ui, &TypeOfIngredient::VEGETABLE);
+                    ui.separator();
+                    self.display_current_ratio(ui, &TypeOfIngredient::VEGETABLE);
+                });
+
+                ui.separator();
+
+                ui.horizontal(|ui| {
+                    self.display_ingredients(ui, &TypeOfIngredient::FRUIT);
+                    ui.separator();
+                    self.display_current_ratio(ui, &TypeOfIngredient::FRUIT);
+                });
+            }
         });
     }
 
