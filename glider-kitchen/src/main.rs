@@ -1,6 +1,4 @@
-mod app;
-
-use crate::app::KitchenApp;
+use glider_kitchen::KitchenApp;
 
 #[cfg(not(target_arch = "wasm32"))]
 fn main() -> eframe::Result<()> {
