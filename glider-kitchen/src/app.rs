@@ -3,7 +3,6 @@ use glider_kitchen_ai::{KitchenAi, TypeOfIngredient};
 use log::info;
 use std::collections::{HashMap, HashSet};
 use std::default::Default;
-use std::path::Path;
 
 pub struct KitchenApp {
     ai: KitchenAi,
@@ -16,9 +15,12 @@ impl KitchenApp {
         // This is also where you can customize the look and feel of egui using
         // `cc.egui_ctx.set_visuals` and `cc.egui_ctx.set_fonts`.
 
+        let mut ai = KitchenAi::new_with_config_content(include_str!("../../config.toml"));
+        ai.load_tables_from_content(include_str!("../../table.toml"));
+
         KitchenApp {
-            ai: KitchenAi::new(Path::new("./config.toml")),
-            tables_loaded: false,
+            ai,
+            tables_loaded: true,
             available_ingredients: Default::default(),
         }
     }
@@ -119,24 +121,15 @@ impl eframe::App for KitchenApp {
     /// Called each time the UI needs repainting, which may be many times per second.
     /// Put your widgets into a `SidePanel`, `TopPanel`, `CentralPanel`, `Window` or `Area`.
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
+        #[cfg(not(target_arch = "wasm32"))] // no File->Quit on web pages!
         egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
             // The top panel is often a good place for a menu bar:
             egui::MenuBar::new().ui(ui, |ui| {
                 ui.menu_button("File", |ui| {
-                    if ui.button("Load tables").clicked() {
-                        if let Some(path) = rfd::FileDialog::new().pick_file() {
-                            self.ai.load_tables(path.as_path());
-                            self.tables_loaded = true;
-                            ui.close()
-                        }
-                    }
-
-                    #[cfg(not(target_arch = "wasm32"))] // no File->Quit on web pages!
                     if ui.button("Quit").clicked() {
                         ctx.send_viewport_cmd(egui::ViewportCommand::Close);
                     }
                 });
-                //egui::widgets::global_theme_preference_buttons(ui);
             });
         });
 
