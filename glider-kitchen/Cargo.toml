@@ -3,7 +3,9 @@ name = "glider-kitchen"
 version = "0.1.0"
 edition = "2024"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[lib]
+# cdylib is required for Android
+crate-type = ["cdylib", "lib"]
 
 [dependencies]
 glider-kitchen-ai = { path = "../glider-kitchen-ai" }
@@ -15,9 +17,12 @@ eframe = { version = "0.32.0", default-features = false, features = [
     "android-native-activity",
 ] }
 env_logger = "0.11.8"
-rfd = "0.15.4"
 log = "0.4.27"
-async-std = "1.13.1"
+
+# android:
+[target.'cfg(target_os = "android")'.dependencies]
+android_logger = "0.15.1"
+winit = "0.30.12"
 
 # native:
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
@@ -35,11 +40,9 @@ opt-level = 2 # fast and small wasm
 [profile.dev.package."*"]
 opt-level = 2
 
-[target.'cfg(android)'.dependencies]
-android_logger = "0.15.1"
-
 [package.metadata.android]
-#build_targets = ["armv7-linux-androideabi", "aarch64-linux-android"]
+package-name = "org.chemicalstorm.sugar-glider-kitchen"
+build_targets = ["aarch64-linux-android"]
 
 [package.metadata.android.sdk]
 min_sdk_version = 23
