@@ -25,7 +25,8 @@ jobs:
         run: cargo install trunk
 
       - name: Build
-        run: trunk build --release
+        # FIXME: Use github.repository to extract this value
+        run: trunk build --release --public-url=glider-kitchen/
         working-directory: glider-kitchen-ui
 
       - name: Upload static files as artifact
