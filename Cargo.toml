@@ -1,6 +1,6 @@
 [workspace]
 members = [
     "glider-kitchen-ai",
-    "glider-kitchen",
+    "glider-kitchen-ui",
 ]
 resolver = "2"
