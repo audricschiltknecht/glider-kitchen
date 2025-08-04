@@ -3,7 +3,7 @@ name: "Build and Publish WebUI on GitHub Pages"
 on:
   push:
     branches:
-      - fix-publish-directory
+      - main
 
 jobs:
   build-webui-artifact:
