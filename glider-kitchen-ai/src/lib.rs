@@ -120,14 +120,25 @@ pub struct KitchenAi {
     recipes: HashMap<TypeOfIngredient, Recipe>,
 }
 
-fn load_file<T>(path: &Path) -> T
+fn load_from_file<T>(path: &Path) -> T
 where
     T: DeserializeOwned,
 {
-    let content = fs::read_to_string(path).expect("Config file needs to be readable");
+    let content = fs::read_to_string(path).unwrap_or_else(|_| {
+        panic!(
+            "Config file {} needs to be readable",
+            path.to_str().unwrap()
+        )
+    });
     toml::from_str(content.as_str()).unwrap()
 }
 
+pub fn load_from_content<T>(content: &str) -> T
+where
+    T: DeserializeOwned,
+{
+    toml::from_str(content).unwrap()
+}
 fn ratio_table_to_table_per_type(
     tables: RatioTable,
 ) -> HashMap<TypeOfIngredient, IngredientToRatio> {
@@ -142,8 +153,17 @@ fn ratio_table_to_table_per_type(
 
 impl KitchenAi {
     pub fn new(config_filepath: &Path) -> KitchenAi {
-        let config: Configuration = load_file(config_filepath);
+        let config: Configuration = load_from_file(config_filepath);
 
+        KitchenAi {
+            config,
+            ratio_tables: Default::default(),
+            recipes: Default::default(),
+        }
+    }
+
+    pub fn new_with_config_content(config_content: &str) -> KitchenAi {
+        let config: Configuration = load_from_content(config_content);
         KitchenAi {
             config,
             ratio_tables: Default::default(),
@@ -159,8 +179,13 @@ impl KitchenAi {
         }
     }
 
-    pub fn load_tables(&mut self, ratio_tables_filepath: &Path) {
-        let ratio_table: RatioTable = load_file(ratio_tables_filepath);
+    pub fn load_tables_from_file(&mut self, ratio_tables_filepath: &Path) {
+        let ratio_table: RatioTable = load_from_file(ratio_tables_filepath);
+        self.ratio_tables = ratio_table_to_table_per_type(ratio_table);
+    }
+
+    pub fn load_tables_from_content(&mut self, ratio_tables_content: &str) {
+        let ratio_table: RatioTable = load_from_content(ratio_tables_content);
         self.ratio_tables = ratio_table_to_table_per_type(ratio_table);
     }
 

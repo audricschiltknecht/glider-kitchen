@@ -23,3 +23,27 @@ jobs:
 
       - name: Run tests
         run: cargo test --verbose
+
+  build-webui:
+    name: "Build Web UI"
+    runs-on: ubuntu-latest
+    needs:
+      - build-and-test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install stable version
+        run: rustup default stable
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+
+      - name: Install WASM target
+        run: rustup target add wasm32-unknown-unknown
+
+      - name: Install trunk
+        run: cargo install trunk
+
+      - name: Build
+        run: trunk build
+        working-directory: glider-kitchen-ui

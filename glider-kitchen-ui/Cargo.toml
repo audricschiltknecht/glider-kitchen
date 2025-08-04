@@ -16,3 +16,20 @@ eframe = { version = "0.32.0", default-features = false, features = [
 env_logger = "0.11.8"
 rfd = "0.15.4"
 log = "0.4.27"
+async-std = "1.13.1"
+
+# native:
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+env_logger = "0.11.8"
+
+# web:
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen-futures = "0.4.50"
+web-sys = "0.3.70"              # to access the DOM (to hide the loading text)
+
+[profile.release]
+opt-level = 2 # fast and small wasm
+
+# Optimize all dependencies even in debug builds:
+[profile.dev.package."*"]
+opt-level = 2
