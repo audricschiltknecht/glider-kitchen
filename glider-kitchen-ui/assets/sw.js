@@ -2,8 +2,8 @@ var cacheName = 'sugar-glider-kitchen-pwa';
 var filesToCache = [
   './',
   './index.html',
-  './glider_kitchen.js',
-  './glider_kitchen_bg.wasm',
+  './glider-kitchen.js',
+  './glider-kitchen_bg.wasm',
 ];
 
 /* Start the service worker and cache all of the app's content */
