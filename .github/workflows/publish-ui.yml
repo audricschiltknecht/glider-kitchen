@@ -36,11 +36,15 @@ jobs:
 
   # Deployment job
   deploy:
+    name: "Deploy WebUI to GitHub Pages"
+    needs: build-webui-artifact
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
     runs-on: ubuntu-latest
-    needs: build-webui-artifact
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
