@@ -1,2 +1,4 @@
 [build]
 filehash = false
+minify = "on_release"
+public_url = "."
