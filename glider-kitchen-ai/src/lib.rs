@@ -1,11 +1,11 @@
-use serde::de::DeserializeOwned;
 use serde::Deserialize;
+use serde::de::DeserializeOwned;
 use std::collections::HashMap;
 use std::collections::HashSet;
 use std::fmt::{Display, Error, Formatter};
+use std::fs;
 use std::hash::{Hash, Hasher};
 use std::path::Path;
-use std::fs;
 
 #[derive(Deserialize, Eq, PartialEq, Hash, Debug, Clone, Copy)]
 #[serde(rename_all = "lowercase")]
@@ -124,7 +124,12 @@ fn load_from_file<T>(path: &Path) -> T
 where
     T: DeserializeOwned,
 {
-    let content = fs::read_to_string(path).unwrap_or_else(|_| { panic!("Config file {} needs to be readable", path.to_str().unwrap()) });
+    let content = fs::read_to_string(path).unwrap_or_else(|_| {
+        panic!(
+            "Config file {} needs to be readable",
+            path.to_str().unwrap()
+        )
+    });
     toml::from_str(content.as_str()).unwrap()
 }
 

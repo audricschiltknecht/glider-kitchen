@@ -9,7 +9,7 @@ A Rust application that uses AI to predict recipes based on ingredients selectio
   - Standard Rust toolchain
   - Development libraries for GUI (on Linux: X11 or Wayland development packages)
 - For web build:
-  - WASM target 
+  - WASM target
   - [Trunk](https://trunkrs.dev/#install)
 
 ## How to build and run the native app
@@ -140,4 +140,3 @@ To ensure your changes will pass CI before creating a pull request:
 1. Run `pre-commit run --all-files` to check code style and formatting
 2. Run `cargo build` to verify the build succeeds
 3. Run `cargo test` to ensure all tests pass
-
