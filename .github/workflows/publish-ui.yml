@@ -3,7 +3,7 @@ name: "Build and Publish WebUI on GitHub Pages"
 on:
   push:
     branches:
-      - main
+      - fix-publish-directory
 
 jobs:
   build-webui-artifact:
@@ -25,8 +25,7 @@ jobs:
         run: cargo install trunk
 
       - name: Build
-        # FIXME: Use github.repository to extract this value
-        run: trunk build --release --public-url=glider-kitchen/
+        run: trunk build --release
         working-directory: glider-kitchen-ui
 
       - name: Upload static files as artifact
