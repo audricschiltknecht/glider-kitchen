@@ -165,3 +165,25 @@ impl eframe::App for KitchenApp {
         // eframe::set_value(storage, eframe::APP_KEY, self);
     }
 }
+
+
+// Android main needs to be a lib
+#[cfg(target_os = "android")]
+#[unsafe(no_mangle)]
+fn android_main(app: winit::platform::android::activity::AndroidApp) {
+    // Log to android output
+    android_logger::init_once(
+        android_logger::Config::default().with_max_level(log::LevelFilter::Info),
+    );
+
+    let options = eframe::NativeOptions {
+        android_app: Some(app),
+        ..Default::default()
+    };
+    eframe::run_native(
+        "Glider Kitchen",
+        options,
+        Box::new(|cc| Ok(Box::new(KitchenApp::new(cc)))),
+    )
+        .unwrap()
+}
