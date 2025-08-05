@@ -24,8 +24,32 @@ jobs:
       - name: Run tests
         run: cargo test --verbose
 
-  build-webui:
-    name: "Build Web UI"
+#  build-webui:
+#    name: "Build Web UI"
+#    runs-on: ubuntu-latest
+#    needs:
+#      - build-and-test
+#    steps:
+#      - uses: actions/checkout@v4
+#
+#      - name: Install stable version
+#        run: rustup default stable
+#
+#      - name: Cache Rust dependencies
+#        uses: Swatinem/rust-cache@v2
+#
+#      - name: Install WASM target
+#        run: rustup target add wasm32-unknown-unknown
+#
+#      - name: Install trunk
+#        run: cargo install trunk
+#
+#      - name: Build
+#        run: trunk build
+#        working-directory: glider-kitchen-ui
+
+  build-android:
+    name: "Build Android"
     runs-on: ubuntu-latest
     needs:
       - build-and-test
@@ -38,12 +62,9 @@ jobs:
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@v2
 
-      - name: Install WASM target
-        run: rustup target add wasm32-unknown-unknown
-
-      - name: Install trunk
-        run: cargo install trunk
+      - name: Install xbuild
+        run: cargo install --git https://github.com/rust-mobile/xbuild
 
       - name: Build
-        run: trunk build
+        run: x build --platform android --arch arm64
         working-directory: glider-kitchen-ui
