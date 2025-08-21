@@ -44,10 +44,10 @@ ratio = 1.5
 #type = "fruit"
 #ratio = 1.4
 
-#[[entry]]
-#name = "tangerine"
-#type = "fruit"
-#ratio = 1.4
+[[entry]]
+name = "tangerine"
+type = "fruit"
+ratio = 1.4
 
 [[entry]]
 name = "pamplemousse rose/rouge"
@@ -104,10 +104,10 @@ name = "melon jaune"
 type = "fruit"
 ratio = 0.7
 
-#[[entry]]
-#name = "abricot"
-#type = "fruit"
-#ratio = 0.7
+[[entry]]
+name = "abricot"
+type = "fruit"
+ratio = 0.7
 
 [[entry]]
 name = "kiwi"
@@ -134,10 +134,10 @@ name = "cantaloup"
 type = "fruit"
 ratio = 0.6
 
-#[[entry]]
-#name = "citrouille"
-#type = "fruit"
-#ratio = 0.5
+[[entry]]
+name = "citrouille"
+type = "fruit"
+ratio = 0.5
 
 # Disabled because of contreverse around it
 #[[entry]]
@@ -200,10 +200,10 @@ name = "choux cavalier"
 type = "vegetable"
 ratio = 14.5
 
-#[[entry]]
-#name = "feuille de moutarge"
-#type = "vegetable"
-#ratio = 7.5
+[[entry]]
+name = "feuille de moutarge"
+type = "vegetable"
+ratio = 7.5
 
 [[entry]]
 name = "feuille de betterave"
@@ -215,65 +215,65 @@ name = "bok choy"
 type = "vegetable"
 ratio = 2.9
 
-#[[entry]]
-#name = "feuille de pissentlit"
-#type = "vegetable"
-#ratio = 2.8
+[[entry]]
+name = "feuille de pissentlit"
+type = "vegetable"
+ratio = 2.8
 
-#[[entry]]
-#name = "choux chinois"
-#type = "vegetable"
-#ratio = 2.8
+[[entry]]
+name = "choux chinois"
+type = "vegetable"
+ratio = 2.8
 
 [[entry]]
 name = "laitue frisée"
 type = "vegetable"
 ratio = 2.7
 
-#[[entry]]
-#name = "persil"
-#type = "vegetable"
-#ratio = 2.4
+[[entry]]
+name = "persil"
+type = "vegetable"
+ratio = 2.4
 
 [[entry]]
 name = "choux kale"
 type = "vegetable"
 ratio = 2.4
 
-#[[entry]]
-#name = "chicorée"
-#type = "vegetable"
-#ratio = 2.1
+[[entry]]
+name = "chicorée"
+type = "vegetable"
+ratio = 2.1
 
 [[entry]]
 name = "choux vert"
 type = "vegetable"
 ratio = 2
 
-#[[entry]]
-#name = "épinard"
-#type = "vegetable"
-#ratio = 2
+[[entry]]
+name = "épinard"
+type = "vegetable"
+ratio = 2
 
-#[[entry]]
-#name = "cresson"
-#type = "vegetable"
-#ratio = 2
+[[entry]]
+name = "cresson"
+type = "vegetable"
+ratio = 2
 
 [[entry]]
 name = "endive"
 type = "vegetable"
 ratio = 1.9
 
-#[[entry]]
-#name = "courge spaghetti"
-#type = "vegetable"
-#ratio = 1.9
+[[entry]]
+name = "courge spaghetti"
+type = "vegetable"
+ratio = 1.9
 
-#[[entry]]
-#name = "courge musquée"
-#type = "vegetable"
-#ratio = 1.5
+[[entry]]
+name = "courge musquée"
+type = "vegetable"
+ratio = 1.5
 
 [[entry]]
 name = "céleri"
@@ -395,10 +395,10 @@ name = "avocat"
 type = "vegetable"
 ratio = 0.3
 
-#[[entry]]
-#name = "maïs"
-#type = "vegetable"
-#ratio = 0.2
+[[entry]]
+name = "maïs"
+type = "vegetable"
+ratio = 0.2
 
 [[entry]]
 name = "pois vert"
